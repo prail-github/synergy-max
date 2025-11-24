@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SynergyMax™ Strategic Vision Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e3c72;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 1s ease-out;
+            padding: 40px;
+        }
+
+        .welcome-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .logo {
+            font-size: 4em;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .mascot {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .tagline {
+            font-size: 1.8em;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .welcome-text {
+            max-width: 800px;
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .audio-prompt {
+            margin-top: 50px;
+            margin-bottom: 80px;
+            padding: 30px 40px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .audio-question {
+            font-size: 1.4em;
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .audio-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .audio-button {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .audio-button.yes {
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
+        }
+
+        .audio-button.yes:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6);
+        }
+
+        .audio-button.no {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .audio-button.no:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .welcome-instruction {
+            font-size: 1em;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 40px;
+            font-style: italic;
+            display: none;
+        }
+
+        .welcome-attribution {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75em;
+        }
+
+        .welcome-attribution hr {
+            width: 120px;
+            margin: 0 auto 12px;
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .welcome-attribution a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+        }
+
+        .welcome-attribution a:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Background image container */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .background-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .background-layer.active {
+            opacity: 1;
+        }
+
+        /* Dark overlay for readability */
+        .dark-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2;
+        }
+
+        /* Main content container */
+        .main-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        .main-container.active {
+            opacity: 1;
+        }
+
+        /* Text container with frosted glass effect */
+        .text-container {
+            width: 900px;
+            max-width: 90%;
+            margin: 40px;
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .text-container.visible {
+            opacity: 1;
+        }
+
+        .vision-text {
+            font-size: 1.8em;
+            line-height: 1.6;
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8),
+                         0 0 20px rgba(0, 0, 0, 0.6);
+            min-height: 3em;
+            white-space: pre-wrap;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            hyphens: none;
+            -webkit-hyphens: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .vision-text.long-text {
+            font-size: 1.5em;
+        }
+
+        .vision-text.very-long-text {
+            font-size: 1.3em;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            color: white;
+            font-size: 0.9em;
+            z-index: 100;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .footer.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .footer-left {
+            flex: 1;
+        }
+
+        .footer-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .mute-button {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mute-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .mute-button.muted {
+            background: rgba(255, 100, 100, 0.3);
+            border-color: rgba(255, 100, 100, 0.6);
+        }
+
+        .copy-button {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .copy-button.copied {
+            background: rgba(100, 255, 100, 0.3);
+            border-color: rgba(100, 255, 100, 0.6);
+        }
+
+        /* Auto-hide cursor during presentation */
+        body.presentation-mode {
+            cursor: none;
+        }
+
+        body.presentation-mode .footer,
+        body.presentation-mode .footer * {
+            cursor: auto;
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5em;
+            }
+
+            .mascot {
+                width: 60px;
+                height: 60px;
+            }
+
+            .tagline {
+                font-size: 1.2em;
+            }
+
+            .welcome-text {
+                font-size: 1em;
+            }
+
+            .audio-question {
+                font-size: 1.1em;
+            }
+
+            .audio-button {
+                padding: 12px 30px;
+                font-size: 1em;
+            }
+
+            .text-container {
+                margin: 20px;
+                padding: 30px;
+            }
+
+            .vision-text {
+                font-size: 1.4em;
+            }
+
+            .vision-text.long-text {
+                font-size: 1.2em;
+            }
+
+            .vision-text.very-long-text {
+                font-size: 1em;
+            }
+
+            .footer {
+                flex-direction: column;
+                gap: 10px;
+                padding: 0 20px;
+            }
+
+            .footer-right {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="logo">
+            <img src="images/synergy-max-mascot.png" alt="Synergy Max" class="mascot">
+            <span>SynergyMax™</span>
+        </div>
+        <div class="tagline">Strategic Vision Generator</div>
+        <div class="welcome-text">
+            Welcome to <strong>SynergyMax™</strong>, your AI-powered strategic consultant delivering enterprise-grade insights without the consulting fees. Our proprietary algorithm leverages cutting-edge paradigms to synthesize actionable vision statements.
+        </div>
+        <div class="welcome-text">
+            Experience data-driven strategic guidance that's as effective as a high-priced consultant—minus the billable hours. Each vision statement is carefully optimized to maximize stakeholder engagement while minimizing accountability.
+        </div>
+        
+        <div class="audio-prompt" id="audioPrompt">
+            <div class="audio-question">Enable ambient sound?</div>
+            <div class="audio-buttons">
+                <button class="audio-button yes" id="audioYes">Yes</button>
+                <button class="audio-button no" id="audioNo">No</button>
+            </div>
+        </div>
+        
+        <div class="welcome-attribution">
+            Images from <a href="https://unsplash.com" target="_blank">Unsplash</a> & <a href="https://pexels.com" target="_blank">Pexels</a> · Audio from <a href="https://freesound.org" target="_blank">Freesound</a>
+        </div>
+    </div>
+
+    <!-- Background image container -->
+    <div class="background-container" id="backgroundContainer">
+        <div class="background-layer" id="backgroundLayer1"></div>
+        <div class="background-layer" id="backgroundLayer2"></div>
+        <div class="dark-overlay"></div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-container" id="mainContainer">
+        <div class="text-container" id="textContainer">
+            <div class="vision-text" id="visionText"></div>
+        </div>
+    </div>
+
+    <div class="footer" id="footer">
+        <div class="footer-left">© 2025 SynergyMax™ | <span id="advanceText">Click to advance</span></div>
+        <div class="footer-right">
+            <button class="copy-button" id="copyButton">
+                <span id="copyIcon">📋</span>
+                <span id="copyText">Copy</span>
+            </button>
+            <button class="mute-button" id="muteButton">
+                <span id="muteIcon">🔊</span>
+                <span id="muteText">Mute</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Detect if device is touch-enabled (mobile/tablet)
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        
+        // Update advance text based on device type
+        if (isTouchDevice) {
+            document.getElementById('advanceText').textContent = 'Tap to advance';
+        }
+
+        // SHORT: Ultra-short clichés (5-8 words)
+        const shortCliches = [
+            "There's no me in team.",
+            "It is what it is.",
+            "I know I have a cubicle, but my door is always open.",
+            "Failure is not an option.",
+            "Teamwork makes the dream work.",
+            "Let's take that offline.",
+            "Let's circle back on that.",
+            "That's outside my swim lane and also not in my wheelhouse, which is actually on fire.",
+            "Let's put a pin in that.",
+            "That's just table states for showing up to the table.",
+            "Let's stop working smarter and start working longer.",
+            "I don't have the bandwidth for that.",
+            "Let's ensure our vision, mission, and values all say the exact same thing in slightly different fonts.",
+            "We need more bandwidth before we can discuss our bandwidth.",
+            "Let's touch base to touch base about touching base.",
+            "Going forward, let's move forward by going forward.",
+            "I need a hard stop before our hard stop.",
+            "Can you verb that noun for me by COB?",
+            "Our go-forward plan is aggressive backtracking at full speed.",
+            "Let's realign our north star.",
+            "Let's not complexify the simplification when we can solutionize.",
+            "Let's make sure this is highly visible to leardership without actually doing it.",
+            "We're building the airplane mid-flight.",
+            "Let's make this actionable.",
+            "That's a future-state problem.",
+            "Let's enhance cross-functional velocity through thought leadership.",
+            "We need to operationalize that.",
+            "Let's close the loop and pivot to a scalable solution.",
+            "We're not here to boil the ocean.",
+            "That's on my radar but far above my pay grade.",
+            "We need to manage expectations, so lower the bar so far we can trip over it.",
+            "Can you action that?",
+            "Let's over-communicate rather than under-communicate.",
+            "Let’s socialize this deck before we pressure-test the narrative.",
+            "This is a heavy lift, but we’re resourced to resource it.",
+            "We outsourced innovation so we can focus on our real core competency: writing mission statements about innovation.",
+            "Let’s cascade this down after we bubble it up.",
+            "It’s not a layoff, it’s a strategic realignment of headcount to zero.",
+            "We’re rightsizing our ambition to match our budget.",
+            "Innovation is core to our culture—that’s why we outsourced it.",
+            "We may be slow, but we do lousy work.",
+            "This quarter we’re focusing on focus."
+        ];
+
+        // MEDIUM: Corporate run-ons with 2-3 buzzwords
+        const mediumPhrases = [
+            "At the end of the day, we need to think outside the box to achieve a win-win scenario.",
+            "Moving forward, we should leverage synergies to optimize our core competencies.",
+            "Net-net, we have to break down silos and grab the low-hanging fruit.",
+            "Going forward, let's push the envelope and move the needle on our KPIs.",
+            "Bottom line, we need to align our stakeholders and drill down on the metrics.",
+            "The reality is, we must incentivize performance to drive continuous improvement.",
+            "To be honest, we should unpack the customer journey and create visibility.",
+            "Strategically speaking, we need to future-proof our strategy and scale our impact.",
+            "From a high-level perspective, let's deep dive into the data and maximize bandwidth.",
+            "In terms of our core competencies, we must leverage big data to reduce pain points.",
+            "At a high level, we need to align our value proposition with stakeholder expectations and drive traction across key verticals.",
+            "To create momentum, we must leverage our digital ecosystem and optimize for end-to-end visibility.",
+            "We need to operationalize our blue-sky thinking and bring it down to brass tacks.",
+            "Let's ideate a scalable framework that enhances our cross-functional synergy.",
+            // HYPER-BUZZWORD PHRASES - Properly formed
+            "We need to amplify our strategic alignment across all touchpoints.",
+            "Let's orchestrate a paradigm shift in our value delivery model.",
+            "We must harmonize our go-to-market strategy with customer expectations.",
+            "It's time to disambiguate our messaging and create stakeholder clarity.",
+            "Let's productize our thought leadership and scale our market influence.",
+            "We should evangelize our core values to maximize team engagement.",
+            "We need to right-size our operational framework for sustainable growth.",
+            "Let's socialize this initiative across all business units.",
+            "We must upskill our workforce to remain competitive.",
+            "Time to operationalize our strategic vision into executable deliverables.",
+            "Let's ideate innovative solutions that drive measurable outcomes.",
+            "We need to de-layer our organizational structure for greater agility.",
+            "We should focus on enablement strategies that empower our teams.",
+            // NEW ADDITIONS
+            "We must synchronize our core competencies and leverage an end-to-end framework.",
+            "To ensure success, we should deploy a center of excellence that harmonizes key touchpoints.",
+            "Net-net, let's unpack the data and evangelize our value proposition to key stakeholders.",
+            "Let's iterate on this feature to ensure we achieve maximum frictionlessness for the end user.",
+            "We need to deploy a center of excellence that operationalizes our value-add streams.",
+            "Moving forward, we must sunset our legacy methodologies and embrace an agile framework.",
+            "Our goal is to leverage our data lake to democratize information and foster scalable alignment.",
+            "Let's focus on low-hanging fruit and ensure every deliverable is hyper-personalized.",
+            "We must pivot to a solutions-based paradigm that is both future-proof and cost-effective.",
+            "The key is driving seamless integration across all business units to maximize our throughput.",
+            "We need to empower our team members to become change agents within our core vertical.",
+            "We need to shift from a culture of 'no' to a culture of 'how.'",
+            "Let's pressure-test our assumptions and stress-test our deliverables.",
+            "We're moving from a fixed mindset to a growth mindset at scale.",
+            "This is a marathon, not a sprint… but we need to sprint this quarter.",
+            "We need to be more proactive about our reactivity.",
+            "Let's drill down and double-click on the why behind the what.",
+            "We have to stop admiring the problem and start solutioning the solution.",
+            "Our goal is to move the goalposts in a customer-centric way."
+        ];
+
+        // LONG: Absurdly long run-on sentences
+        const longAbsurdities = [
+            "At the end of the day, we need to step up to the plate and take this to the next level by making it a paradigm shift to a win-win scenario that will deliver legendary, actionable, and value-add results across all verticals.",
+            "Moving forward, we should break down silos, complete action items, reduce pain points, increase transparency, scale up our bandwidth, and embrace change through enterprise thought leadership while keeping the pipeline full.",
+            "Net-net, when your plate is full you need to move the needle, embrace a paradigm shift, think outside the box, grab the low-hanging fruit, and push the envelope to achieve next-generation, future-proof, data-driven operational excellence.",
+            "Going forward, let's leverage our core competencies, optimize the customer journey, drill down on our metrics, deep dive into the ecosystem, align our stakeholders, and create visibility around key touchpoints to maximize sustainable growth.",
+            "Bottom line, we have to incentivize performance, drive continuous improvement, future-proof our strategy, scale our impact, unpack the data, and establish thought leadership while we touch base offline about putting a pin in it.",
+            "The reality is, we must think outside the box, work smarter not harder, get our ducks in a row, bring our whole selves to work, and leverage synergistic paradigms to deliver world-class, bleeding-edge, mission-critical outcomes.",
+            "To be honest, several projects in the pipeline will have us burning the candle at both ends while we break down silos, complete action items, move the needle, push the envelope, and optimize our bandwidth to achieve a win-win.",
+            "Strategically speaking, we need to align our metrics with stakeholder expectations, unpack the data, drill down on our core competencies, deep dive into big data analytics, and leverage hyperlocal touchpoints to create a single source of truth.",
+            "From a high-level perspective, let's scale up, increase transparency, embrace change, reduce pain points, generate quick wins, maintain our competitive edge, and drive operational excellence through holistic, data-driven thought leadership.",
+            "In terms of our core competencies, we must take a holistic approach, future-proof the organization, optimize the ecosystem, maximize our impact, ensure scalability, and accelerate digital transformation to unlock sustainable, next-generation value at scale.",
+            "As we move into the next fiscal cycle, it's critical that we embrace a transformational mindset, leverage cross-functional alignment, capitalize on disruptive innovation, and empower our teams to drive value-add deliverables across emerging markets.",
+            "By operationalizing a forward-leaning ecosystem of collaborative, next-generation stakeholders, we can ensure that our organizational DNA remains agile, future-proof, and hyper-optimized for sustainable growth.",
+            "In order to maximize our innovation bandwidth, we must create a center of excellence that unifies our strategic pillars into a cohesive, data-driven framework supported by scalable thought leadership and a frictionless user journey.",
+            // HYPER-BUZZWORD LONG PHRASES
+            "We need to orchestrate a comprehensive digital transformation initiative that will harmonize our legacy systems with next-generation cloud infrastructure, amplify our competitive advantages, and productize our intellectual property into scalable revenue streams.",
+            "Let's ideate a revolutionary approach that will disambiguate our value proposition, evangelize our brand story across all channels, and operationalize our customer success framework to drive exponential growth and market dominance.",
+            "We must upskill our entire organization to enable cross-functional collaboration, de-layer bureaucratic bottlenecks, right-size our resource allocation, and socialize best practices that amplify our collective impact across global markets.",
+            // NEW ADDITIONS
+            "In order to maximize our innovation bandwidth, we must create a frictionless user journey that capitalizes on disruptive synergy and unlocks hyper-optimized value streams.",
+            "We need to strategically sunset our legacy platforms by de-layering our architecture and orchestrating a transformational shift to agile, cloud-native thought leadership.",
+            "By strategically leveraging our ecosystem of synergistic, cross-functional, and digital assets, we can fundamentally pivot our entire value proposition to capture bleeding-edge market share while maintaining a laser focus on the optimal customer journey.",
+            "To ensure next-generation scalability and competitive advantage, we must deep-dive into our core competencies, establish robust guardrails for our MVP, and then productize our thought leadership into a frictionless, end-to-end user experience.",
+            "The mandate is to drive continuous improvement by de-layering our organizational structure, right-sizing our resource bandwidth, and evangelizing a culture of accountability that empowers every stakeholder to optimize for quantifiable outcomes.",
+            "As we lean into the new year, we need to double down on our core pillars, rightsizing our headcount-to-ambition ratio while maintaining psychological safety in a hybrid-first, mobile-first, cloud-first, AI-first world so that we can continue to deliver best-in-class shareholder value in an increasingly volatile macroeconomic environment.",
+            "Net-net-net, when all is said and done, at this moment in time we need to take a step back, zoom out, re-baseline our goals, re-visit our North Star, re-evaluate our swim lanes, and ultimately re-commit to over-delivering on a go-forward basis.",
+            "We're not just transforming, we're digitally transforming our transformation journey in a way that's agile, resilient, and human-centered while still being laser-focused on ROI."
+        ];
+
+        // Self-important "busy/plate-full" declarations
+        const busyImportantPhrases = [
+            "I don't have the bandwidth right now, but let's circle back when we have more bandwidth to discuss our bandwidth constraints.",
+            "My plate is full, but we need to fill our plates with more action items before we can clear our plates.",
+            "We're burning the candle at both ends, so we need to burn more candles to see where we're burning our candles.",
+            "I'm double-booked for that meeting about being double-booked.",
+            "Let's schedule a meeting to discuss why we have so many meetings about scheduling meetings.",
+            "We need to take this offline so we can bring it back online to take it offline again.",
+            "I'll ping you to set up time to ping about when we can ping each other.",
+            "Let's put a pin in putting pins in things until we can unpin all the pins we've pinned.",
+            "I'm triple-booked but let's find time to unpack that.",
+            "I'm waiting for clarity from leadership who are waiting for clarity from us.",
+            "We need to establish a cadence for establishing cadence.",
+            "I'll be heads-down circling back today.",
+            "Our timeline is aggressive, but not impossible if we believe.",
+            "I'm waiting for someone to green-light the green-lighting process.",
+            "We're currently swamped, so let's set up a one-hour meeting to discuss how we can reduce meeting overload.",
+            "I'm heads-down generating deliverables, so please send me an email summarizing what I need to prioritize.",
+            "Let's align on the objective of the alignment meeting.",
+            "I'm in back-to-back-to-backs but let's find a window.",
+            "I'm OOO but saw this and had to jump in.",
+            "I'll over-communicate this because under-communication is our biggest risk.",
+            "Let's hop on a quick call to align before we misalign.",
+            "I'm wearing multiple hats right now, but I'll delegate a hat."
+        ];
+
+        // Ambient music tracks
+        const ambientTracks = [
+            'audio/699843__meditation-opening-1,16.mp3',
+            'audio/718704__meditate-2-2,0.mp3',
+            'audio/735309__calm-ending-1,27.mp3',
+            'audio/655395__meditation.mp3',
+            'audio/720255__meditate.mp3'
+        ];
+
+        // Generate image array from corporate-1.jpg to corporate-N.jpg  // LIMIT 
+        const num_images = 94;
+        const images = [];
+        for (let i = 1; i <= num_images; i++) {
+            images.push(`images/corporate-${i}.jpg`);
+        }
+
+        // Audio state
+        let audioEnabled = false;
+        let audioMuted = false;
+        let currentAmbientAudio = null;
+        let nextAmbientAudio = null;
+        let availableTracks = [...ambientTracks];
+        let fadeInterval = null;
+
+        // Presentation state
+        let availableImages = [...images];
+        let currentTypingTimeout = null;
+        let autoAdvanceTimeout = null;
+        let welcomeTimeout = null;
+        let isTyping = false;
+        let isTransitioning = false;
+        let hasStarted = false;
+        let footerTimeout = null;
+        let currentLayer = 1;
+        let wakeLock = null;
+        let currentVisionText = '';
+        let cursorTimeout = null;
+
+        // Audio button handlers
+        document.getElementById('audioYes').addEventListener('click', () => {
+            audioEnabled = true;
+            initializeAudio();
+            startPresentation();
+        });
+
+        document.getElementById('audioNo').addEventListener('click', () => {
+            audioEnabled = false;
+            startPresentation();
+        });
+
+        // Initialize audio system
+        function initializeAudio() {
+            if (!audioEnabled) return;
+
+            currentAmbientAudio = new Audio();
+            currentAmbientAudio.volume = 0.15;
+            currentAmbientAudio.preload = 'auto';
+
+            nextAmbientAudio = new Audio();
+            nextAmbientAudio.volume = 0;
+            nextAmbientAudio.preload = 'auto';
+
+            document.getElementById('muteButton').style.display = 'flex';
+        }
+
+        // Get random track from available pool
+        function getRandomTrack() {
+            if (availableTracks.length === 0) {
+                availableTracks = [...ambientTracks];
+            }
+            const index = Math.floor(Math.random() * availableTracks.length);
+            const track = availableTracks[index];
+            availableTracks.splice(index, 1);
+            return track;
+        }
+
+        // Start ambient music
+        function startAmbientMusic() {
+            if (!audioEnabled || audioMuted) return;
+
+            const track = getRandomTrack();
+            //console.log('🎵 Now playing:', track);   // DEBUG
+
+            currentAmbientAudio.src = track;
+            currentAmbientAudio.volume = 0;
+            
+            currentAmbientAudio.play().then(() => {
+                fadeVolume(currentAmbientAudio, 0, 0.15, 2000);
+            }).catch(err => {
+                console.log('Audio playback failed:', err);
+            });
+
+            currentAmbientAudio.onended = () => {
+                crossfadeToNextTrack();
+            };
+        }
+
+        // Crossfade to next track
+        function crossfadeToNextTrack() {
+            if (!audioEnabled || audioMuted) return;
+
+            const nextTrack = getRandomTrack();
+            //console.log('🎵 Crossfading to:', nextTrack); // DEBUG
+
+            nextAmbientAudio.src = nextTrack;
+            nextAmbientAudio.volume = 0;
+
+            nextAmbientAudio.play().then(() => {
+                const duration = 3000;
+                fadeVolume(currentAmbientAudio, currentAmbientAudio.volume, 0, duration);
+                fadeVolume(nextAmbientAudio, 0, 0.15, duration);
+
+                setTimeout(() => {
+                    const temp = currentAmbientAudio;
+                    currentAmbientAudio = nextAmbientAudio;
+                    nextAmbientAudio = temp;
+                    
+                    currentAmbientAudio.onended = () => {
+                        crossfadeToNextTrack();
+                    };
+                }, duration);
+            }).catch(err => {
+                console.log('Audio crossfade failed:', err);
+            });
+        }
+
+        // Fade volume utility
+        function fadeVolume(audioElement, startVol, endVol, duration) {
+            if (!audioElement) return;
+
+            const steps = 50;
+            const stepTime = duration / steps;
+            const volumeChange = (endVol - startVol) / steps;
+            let currentStep = 0;
+
+            if (fadeInterval) clearInterval(fadeInterval);
+
+            fadeInterval = setInterval(() => {
+                currentStep++;
+                const newVolume = startVol + (volumeChange * currentStep);
+                audioElement.volume = Math.max(0, Math.min(1, newVolume));
+
+                if (currentStep >= steps) {
+                    clearInterval(fadeInterval);
+                    audioElement.volume = endVol;
+                }
+            }, stepTime);
+        }
+
+        // Mute toggle
+        document.getElementById('muteButton').addEventListener('click', () => {
+            audioMuted = !audioMuted;
+            const muteIcon = document.getElementById('muteIcon');
+            const muteText = document.getElementById('muteText');
+            const muteButton = document.getElementById('muteButton');
+
+            if (audioMuted) {
+                if (currentAmbientAudio) currentAmbientAudio.volume = 0;
+                if (nextAmbientAudio) nextAmbientAudio.volume = 0;
+                muteIcon.textContent = '🔇';
+                muteText.textContent = 'Unmute';
+                muteButton.classList.add('muted');
+            } else {
+                if (currentAmbientAudio && currentAmbientAudio.src) {
+                    currentAmbientAudio.volume = 0.15;
+                }
+                muteIcon.textContent = '🔊';
+                muteText.textContent = 'Mute';
+                muteButton.classList.remove('muted');
+            }
+        });
+
+        // Copy button functionality
+        document.getElementById('copyButton').addEventListener('click', async () => {
+            if (!currentVisionText) return;
+
+            const copyButton = document.getElementById('copyButton');
+            const copyIcon = document.getElementById('copyIcon');
+            const copyText = document.getElementById('copyText');
+
+            try {
+                await navigator.clipboard.writeText(currentVisionText);
+                
+                // Visual feedback
+                copyButton.classList.add('copied');
+                copyIcon.textContent = '✓';
+                copyText.textContent = 'Copied!';
+
+                setTimeout(() => {
+                    copyButton.classList.remove('copied');
+                    copyIcon.textContent = '📋';
+                    copyText.textContent = 'Copy';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text:', err);
+                copyText.textContent = 'Failed';
+                setTimeout(() => {
+                    copyText.textContent = 'Copy';
+                }, 2000);
+            }
+        });
+
+        // Request Wake Lock to prevent screen from sleeping (if supported)
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Wake Lock acquired');
+                    
+                    wakeLock.addEventListener('release', () => {
+                        console.log('Wake Lock released');
+                    });
+                }
+            } catch (err) {
+                console.log('Wake Lock not supported or failed:', err);
+            }
+        }
+
+        // Simulate subtle mouse movement every 30 seconds to prevent screensaver
+        setInterval(() => {
+            if (hasStarted) {
+                const event = new MouseEvent('mousemove', {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: 1,
+                    clientY: 1
+                });
+                document.dispatchEvent(event);
+            }
+        }, 30000);
+
+        // Footer visibility on mouse movement
+        function showFooter() {
+            const footer = document.getElementById('footer');
+            footer.classList.add('visible');
+            
+            if (footerTimeout) {
+                clearTimeout(footerTimeout);
+            }
+            
+            footerTimeout = setTimeout(() => {
+                footer.classList.remove('visible');
+            }, 3000);
+        }
+
+        // Cursor auto-hide during presentation
+        function showCursor() {
+            document.body.classList.remove('presentation-mode');
+            
+            if (cursorTimeout) {
+                clearTimeout(cursorTimeout);
+            }
+            
+            // Hide cursor after 2 seconds of no movement (only during presentation)
+            cursorTimeout = setTimeout(() => {
+                if (hasStarted) {
+                    document.body.classList.add('presentation-mode');
+                }
+            }, 2000);
+        }
+
+        document.addEventListener('mousemove', () => {
+            if (hasStarted) {
+                showFooter();
+                showCursor();
+            }
+        });
+
+        // Show cursor when mouse enters window, hide when it leaves
+        document.addEventListener('mouseenter', () => {
+            if (hasStarted) {
+                showCursor();
+            }
+        });
+
+        document.addEventListener('mouseleave', () => {
+            if (hasStarted) {
+                document.body.classList.remove('presentation-mode');
+                if (cursorTimeout) {
+                    clearTimeout(cursorTimeout);
+                }
+            }
+        });
+
+        function getRandomElement(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function getRandomImage() {
+            if (availableImages.length === 0) {
+                availableImages = [...images];
+            }
+            const index = Math.floor(Math.random() * availableImages.length);
+            const image = availableImages[index];
+            availableImages.splice(index, 1);
+            return image;
+        }
+
+        function generateVisionStatement() {
+            const rand = Math.random();
+            
+            if (rand < 0.20) {
+                return getRandomElement(shortCliches);
+            }
+            
+            if (rand < 0.40) {
+                return getRandomElement(busyImportantPhrases);
+            }
+            
+            if (rand < 0.70) {
+                return getRandomElement(mediumPhrases);
+            }
+            
+            return getRandomElement(longAbsurdities);
+        }
+
+        function typewriterEffect(element, text, charDelay = 30, onComplete = null) {
+            element.textContent = '';
+            isTyping = true;
+            
+            // Store current text for copy functionality
+            currentVisionText = text;
+            
+            // Replace regular hyphens with non-breaking hyphens to prevent browser line breaks
+            const processedText = text.replace(/-/g, '\u2011');
+            
+            const words = processedText.split(' ');
+            let currentWordIndex = 0;
+            let currentCharIndex = 0;
+            let currentLineWidth = 0;
+            
+            const measureSpan = document.createElement('span');
+            measureSpan.style.visibility = 'hidden';
+            measureSpan.style.position = 'absolute';
+            measureSpan.style.whiteSpace = 'nowrap';
+            measureSpan.style.font = window.getComputedStyle(element).font;
+            document.body.appendChild(measureSpan);
+            
+            function measureWord(word) {
+                measureSpan.textContent = word;
+                return measureSpan.offsetWidth;
+            }
+            
+            function measureSpace() {
+                measureSpan.textContent = '\u00A0';
+                return measureSpan.offsetWidth;
+            }
+            
+            const spaceWidth = measureSpace();
+            
+            function typeChar() {
+                if (currentWordIndex >= words.length) {
+                    document.body.removeChild(measureSpan);
+                    isTyping = false;
+                    if (onComplete) onComplete();
+                    return;
+                }
+                
+                const currentWord = words[currentWordIndex];
+                const wordWidth = measureWord(currentWord);
+                const containerWidth = element.offsetWidth;
+                
+                if (currentCharIndex === 0 && element.textContent.length > 0) {
+                    // Check if adding this word would overflow
+                    const widthWithWord = currentLineWidth + spaceWidth + wordWidth;
+                    
+                    if (widthWithWord > containerWidth) {
+                        element.textContent += '\n';
+                        currentLineWidth = 0;
+                    } else {
+                        element.textContent += ' ';
+                        currentLineWidth += spaceWidth;
+                    }
+                }
+                
+                if (currentCharIndex < currentWord.length) {
+                    element.textContent += currentWord[currentCharIndex];
+                    currentCharIndex++;
+                    
+                    // Update line width tracking
+                    measureSpan.textContent = currentWord.substring(0, currentCharIndex);
+                    if (currentCharIndex === currentWord.length) {
+                        currentLineWidth += measureSpan.offsetWidth;
+                    }
+                    
+                    let delay = charDelay;
+                    const lastChar = currentWord[currentCharIndex - 1];
+                    if (lastChar === '.') {
+                        delay = 400;
+                    } else if (lastChar === ',') {
+                        delay = 200;
+                    }
+                    
+                    currentTypingTimeout = setTimeout(typeChar, delay);
+                } else {
+                    currentWordIndex++;
+                    currentCharIndex = 0;
+                    currentTypingTimeout = setTimeout(typeChar, charDelay);
+                }
+            }
+            
+            typeChar();
+        }
+
+        function showNextSlide() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            
+            if (currentTypingTimeout) clearTimeout(currentTypingTimeout);
+            if (autoAdvanceTimeout) clearTimeout(autoAdvanceTimeout);
+
+            const layer1 = document.getElementById('backgroundLayer1');
+            const layer2 = document.getElementById('backgroundLayer2');
+            const textContainer = document.getElementById('textContainer');
+            const visionText = document.getElementById('visionText');
+
+            textContainer.classList.remove('visible');
+
+            setTimeout(() => {
+                const selectedImage = getRandomImage();
+                //console.log('🖼️ Now showing:', selectedImage);  // DEBUG
+                
+                if (currentLayer === 1) {
+                    layer2.style.backgroundImage = `url('${selectedImage}')`;
+                    layer2.classList.add('active');
+                    layer1.classList.remove('active');
+                    currentLayer = 2;
+                } else {
+                    layer1.style.backgroundImage = `url('${selectedImage}')`;
+                    layer1.classList.add('active');
+                    layer2.classList.remove('active');
+                    currentLayer = 1;
+                }
+
+                const vision = generateVisionStatement();
+                visionText.textContent = '';
+
+                visionText.classList.remove('long-text', 'very-long-text');
+                if (vision.length > 300) {
+                    visionText.classList.add('very-long-text');
+                } else if (vision.length > 200) {
+                    visionText.classList.add('long-text');
+                }
+
+                setTimeout(() => {
+                    textContainer.classList.add('visible');
+                    
+                    setTimeout(() => {
+                        typewriterEffect(visionText, vision, 60, () => {
+                            isTransitioning = false;
+                            autoAdvanceTimeout = setTimeout(showNextSlide, 10000);
+                        });
+                    }, 500);
+                }, 500);
+            }, 1000);
+        }
+
+        function startPresentation() {
+            if (hasStarted) return;
+            hasStarted = true;
+
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const mainContainer = document.getElementById('mainContainer');
+
+            if (welcomeTimeout) clearTimeout(welcomeTimeout);
+
+            requestWakeLock();
+
+            if (audioEnabled) {
+                startAmbientMusic();
+            }
+
+            welcomeScreen.classList.add('fade-out');
+
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none';
+                mainContainer.classList.add('active');
+                showNextSlide();
+            }, 1000);
+        }
+
+        welcomeTimeout = setTimeout(() => {
+            if (!hasStarted && document.getElementById('audioPrompt').style.display !== 'none') {
+                audioEnabled = false;
+                startPresentation();
+            }
+        }, 20000);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                
+                if (!hasStarted && document.getElementById('audioPrompt').style.display === 'none') {
+                    startPresentation();
+                } else if (hasStarted && !isTransitioning) {
+                    showNextSlide();
+                }
+            }
+        });
+
+        // Add click event to advance slides
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.audio-button') || e.target.closest('.mute-button')) {
+                return;
+            }
+            
+            if (hasStarted && !isTransitioning) {
+                showNextSlide();
+            }
+        });
+    </script>
+</body>
+</html>
