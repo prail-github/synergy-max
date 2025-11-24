@@ -33,7 +33,7 @@
             z-index: 1000;
             opacity: 1;
             transition: opacity 1s ease-out;
-            padding: 40px;
+            padding: 20px;
         }
 
         .welcome-screen.fade-out {
@@ -42,10 +42,10 @@
         }
 
         .logo {
-            font-size: 4em;
+            font-size: 3.5em;
             font-weight: bold;
             color: white;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
@@ -53,32 +53,32 @@
         }
 
         .mascot {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             object-fit: contain;
             filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.3));
         }
 
         .tagline {
-            font-size: 1.8em;
+            font-size: 1.5em;
             color: rgba(255, 255, 255, 0.95);
-            margin-bottom: 40px;
+            margin-bottom: 25px;
             font-weight: 300;
         }
 
         .welcome-text {
             max-width: 800px;
-            font-size: 1.2em;
-            line-height: 1.8;
+            font-size: 1.1em;
+            line-height: 1.6;
             color: white;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .audio-prompt {
-            margin-top: 50px;
-            margin-bottom: 80px;
-            padding: 30px 40px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            padding: 25px 35px;
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
             border-radius: 15px;
@@ -86,9 +86,9 @@
         }
 
         .audio-question {
-            font-size: 1.4em;
+            font-size: 1.3em;
             color: white;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: 500;
         }
 
@@ -164,6 +164,48 @@
 
         .welcome-attribution a:hover {
             color: rgba(255, 255, 255, 0.8);
+        }
+
+        .loading-container {
+            margin-top: 25px;
+            width: 100%;
+            max-width: 500px;
+            display: none;
+        }
+
+        .loading-container.active {
+            display: block;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .loading-stats {
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9em;
+            text-align: center;
         }
 
         /* Background image container */
@@ -253,10 +295,7 @@
                          0 0 20px rgba(0, 0, 0, 0.6);
             min-height: 3em;
             white-space: pre-wrap;
-            word-break: keep-all;
             overflow-wrap: break-word;
-            hyphens: none;
-            -webkit-hyphens: none;
             user-select: none;
             -webkit-user-select: none;
         }
@@ -426,10 +465,7 @@
         </div>
         <div class="tagline">Strategic Vision Generator</div>
         <div class="welcome-text">
-            Welcome to <strong>SynergyMax™</strong>, your AI-powered strategic consultant delivering enterprise-grade insights without the consulting fees. Our proprietary algorithm leverages cutting-edge paradigms to synthesize actionable vision statements.
-        </div>
-        <div class="welcome-text">
-            Experience data-driven strategic guidance that's as effective as a high-priced consultant—minus the billable hours. Each vision statement is carefully optimized to maximize stakeholder engagement while minimizing accountability.
+            Welcome to <strong>SynergyMax™</strong>, your AI-powered strategic consultant delivering enterprise-grade vision statements optimized for maximum stakeholder engagement and minimum accountability.
         </div>
         
         <div class="audio-prompt" id="audioPrompt">
@@ -438,6 +474,14 @@
                 <button class="audio-button yes" id="audioYes">Yes</button>
                 <button class="audio-button no" id="audioNo">No</button>
             </div>
+        </div>
+        
+        <div class="loading-container" id="loadingContainer">
+            <div class="loading-text">Loading experience...</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="loading-stats" id="loadingStats">0 / 98 assets loaded</div>
         </div>
         
         <div class="welcome-attribution">
@@ -493,7 +537,7 @@
             "Let's circle back on that.",
             "That's outside my swim lane and also not in my wheelhouse, which is actually on fire.",
             "Let's put a pin in that.",
-            "That's just table states for showing up to the table.",
+            "That's just table stakes for showing up to the table.",
             "Let's stop working smarter and start working longer.",
             "I don't have the bandwidth for that.",
             "Let's ensure our vision, mission, and values all say the exact same thing in slightly different fonts.",
@@ -505,7 +549,7 @@
             "Our go-forward plan is aggressive backtracking at full speed.",
             "Let's realign our north star.",
             "Let's not complexify the simplification when we can solutionize.",
-            "Let's make sure this is highly visible to leardership without actually doing it.",
+            "Let's make sure this is highly visible to leadership without actually doing it.",
             "We're building the airplane mid-flight.",
             "Let's make this actionable.",
             "That's a future-state problem.",
@@ -674,14 +718,99 @@
         let currentVisionText = '';
         let cursorTimeout = null;
 
+        // Phrase tracking - ensure no repeats until all phrases of each type are used
+        let availableShortCliches = [...shortCliches];
+        let availableBusyImportantPhrases = [...busyImportantPhrases];
+        let availableMediumPhrases = [...mediumPhrases];
+        let availableLongAbsurdities = [...longAbsurdities];
+
+        // Preload state
+        let assetsLoaded = 0;
+        let totalAssets = images.length + ambientTracks.length; // 94 images + 4 audio files = 98
+        let allAssetsLoaded = false;
+
+        // Start preloading immediately
+        preloadAssets();
+
+        // Preload all assets
+        function preloadAssets() {
+            const loadingContainer = document.getElementById('loadingContainer');
+            const progressBar = document.getElementById('progressBar');
+            const loadingStats = document.getElementById('loadingStats');
+            
+            // Show loading UI
+            loadingContainer.classList.add('active');
+            
+            let loadedCount = 0;
+            
+            console.log('🚀 Starting preload of', totalAssets, 'assets...');
+            console.log('📦 Images to load:', images.length);
+            console.log('🎵 Audio files to load:', ambientTracks.length);
+            
+            function updateProgress() {
+                loadedCount++;
+                assetsLoaded = loadedCount;
+                const percentage = (loadedCount / totalAssets) * 100;
+                progressBar.style.width = percentage + '%';
+                loadingStats.textContent = `${loadedCount} / ${totalAssets} assets loaded`;
+                
+                if (loadedCount === totalAssets) {
+                    allAssetsLoaded = true;
+                    console.log('✅ All assets loaded successfully!');
+                    setTimeout(() => {
+                        loadingContainer.classList.remove('active');
+                    }, 500);
+                }
+            }
+            
+            // Preload images
+            images.forEach((imageSrc, index) => {
+                const img = new Image();
+                img.onload = () => {
+                    console.log(`🖼️  Loaded image ${index + 1}/${images.length}:`, imageSrc);
+                    updateProgress();
+                };
+                img.onerror = () => {
+                    console.warn('❌ Failed to load image:', imageSrc);
+                    updateProgress(); // Count it anyway to prevent blocking
+                };
+                img.src = imageSrc;
+            });
+            
+            // Preload audio files
+            ambientTracks.forEach((audioSrc, index) => {
+                const audio = new Audio();
+                audio.preload = 'auto';
+                audio.oncanplaythrough = () => {
+                    console.log(`🎵 Loaded audio ${index + 1}/${ambientTracks.length}:`, audioSrc);
+                    updateProgress();
+                    // Remove event listener to prevent multiple calls
+                    audio.oncanplaythrough = null;
+                };
+                audio.onerror = () => {
+                    console.warn('❌ Failed to load audio:', audioSrc);
+                    updateProgress(); // Count it anyway to prevent blocking
+                };
+                audio.src = audioSrc;
+            });
+        }
+
         // Audio button handlers
         document.getElementById('audioYes').addEventListener('click', () => {
+            if (!allAssetsLoaded) {
+                alert('Please wait for all assets to finish loading...');
+                return;
+            }
             audioEnabled = true;
             initializeAudio();
             startPresentation();
         });
 
         document.getElementById('audioNo').addEventListener('click', () => {
+            if (!allAssetsLoaded) {
+                alert('Please wait for all assets to finish loading...');
+                return;
+            }
             audioEnabled = false;
             startPresentation();
         });
@@ -935,22 +1064,62 @@
             return image;
         }
 
+        function getRandomShortCliche() {
+            if (availableShortCliches.length === 0) {
+                availableShortCliches = [...shortCliches];
+            }
+            const index = Math.floor(Math.random() * availableShortCliches.length);
+            const phrase = availableShortCliches[index];
+            availableShortCliches.splice(index, 1);
+            return phrase;
+        }
+
+        function getRandomBusyImportantPhrase() {
+            if (availableBusyImportantPhrases.length === 0) {
+                availableBusyImportantPhrases = [...busyImportantPhrases];
+            }
+            const index = Math.floor(Math.random() * availableBusyImportantPhrases.length);
+            const phrase = availableBusyImportantPhrases[index];
+            availableBusyImportantPhrases.splice(index, 1);
+            return phrase;
+        }
+
+        function getRandomMediumPhrase() {
+            if (availableMediumPhrases.length === 0) {
+                availableMediumPhrases = [...mediumPhrases];
+            }
+            const index = Math.floor(Math.random() * availableMediumPhrases.length);
+            const phrase = availableMediumPhrases[index];
+            availableMediumPhrases.splice(index, 1);
+            return phrase;
+        }
+
+        function getRandomLongAbsurdity() {
+            if (availableLongAbsurdities.length === 0) {
+                availableLongAbsurdities = [...longAbsurdities];
+            }
+            const index = Math.floor(Math.random() * availableLongAbsurdities.length);
+            const phrase = availableLongAbsurdities[index];
+            availableLongAbsurdities.splice(index, 1);
+            return phrase;
+        }
+
         function generateVisionStatement() {
             const rand = Math.random();
             
             if (rand < 0.20) {
-                return getRandomElement(shortCliches);
+                return getRandomShortCliche();
             }
             
             if (rand < 0.40) {
-                return getRandomElement(busyImportantPhrases);
+                return getRandomBusyImportantPhrase();
             }
             
             if (rand < 0.70) {
-                return getRandomElement(mediumPhrases);
+                return getRandomMediumPhrase();
             }
             
-            return getRandomElement(longAbsurdities);
+            return getRandomLongAbsurdity();
         }
 
         function typewriterEffect(element, text, charDelay = 30, onComplete = null) {
@@ -960,7 +1129,8 @@
             // Store current text for copy functionality
             currentVisionText = text;
             
-            // Replace regular hyphens with non-breaking hyphens to prevent browser line breaks
+            // Replace hyphens with non-breaking hyphens to prevent browser from breaking
+            // hyphenated words like "low-hanging" at the hyphen
             const processedText = text.replace(/-/g, '\u2011');
             
             const words = processedText.split(' ');
@@ -968,11 +1138,18 @@
             let currentCharIndex = 0;
             let currentLineWidth = 0;
             
+            // Create measure span with the SAME styling as the element (including font size class)
             const measureSpan = document.createElement('span');
             measureSpan.style.visibility = 'hidden';
             measureSpan.style.position = 'absolute';
             measureSpan.style.whiteSpace = 'nowrap';
-            measureSpan.style.font = window.getComputedStyle(element).font;
+            // Copy the computed font style to ensure accurate measurement
+            const computedStyle = window.getComputedStyle(element);
+            measureSpan.style.font = computedStyle.font;
+            measureSpan.style.fontSize = computedStyle.fontSize;
+            measureSpan.style.fontWeight = computedStyle.fontWeight;
+            measureSpan.style.fontFamily = computedStyle.fontFamily;
+            measureSpan.style.letterSpacing = computedStyle.letterSpacing;
             document.body.appendChild(measureSpan);
             
             function measureWord(word) {
@@ -985,6 +1162,7 @@
                 return measureSpan.offsetWidth;
             }
             
+            const containerWidth = element.offsetWidth;
             const spaceWidth = measureSpace();
             
             function typeChar() {
@@ -997,30 +1175,48 @@
                 
                 const currentWord = words[currentWordIndex];
                 const wordWidth = measureWord(currentWord);
-                const containerWidth = element.offsetWidth;
                 
+                // At the start of a new word (not first word), decide whether to add space or newline
                 if (currentCharIndex === 0 && element.textContent.length > 0) {
-                    // Check if adding this word would overflow
-                    const widthWithWord = currentLineWidth + spaceWidth + wordWidth;
+                    // Get the current line's text (everything after the last newline)
+                    const lines = element.textContent.split('\n');
+                    const currentLine = lines[lines.length - 1];
                     
-                    if (widthWithWord > containerWidth) {
-                        element.textContent += '\n';
-                        currentLineWidth = 0;
+                    // If current line is empty (just had a line break), don't add space
+                    if (currentLine === '') {
+                        // Just typed to a new line, continue without space
                     } else {
-                        element.textContent += ' ';
-                        currentLineWidth += spaceWidth;
+                        // Measure what the current line would be with space + word
+                        const testSpan = document.createElement('span');
+                        testSpan.style.visibility = 'hidden';
+                        testSpan.style.position = 'absolute';
+                        testSpan.style.whiteSpace = 'nowrap';
+                        const computedStyle = window.getComputedStyle(element);
+                        testSpan.style.font = computedStyle.font;
+                        testSpan.style.fontSize = computedStyle.fontSize;
+                        testSpan.style.fontWeight = computedStyle.fontWeight;
+                        testSpan.style.fontFamily = computedStyle.fontFamily;
+                        testSpan.style.letterSpacing = computedStyle.letterSpacing;
+                        
+                        testSpan.textContent = currentLine + ' ' + currentWord;
+                        document.body.appendChild(testSpan);
+                        const testWidth = testSpan.offsetWidth;
+                        document.body.removeChild(testSpan);
+                        
+                        if (testWidth >= containerWidth) {
+                            // Space + word won't fit, move to next line
+                            element.textContent += '\n';
+                        } else {
+                            // Space + word fits, add space
+                            element.textContent += ' ';
+                        }
                     }
                 }
                 
+                // Type the next character of the current word
                 if (currentCharIndex < currentWord.length) {
                     element.textContent += currentWord[currentCharIndex];
                     currentCharIndex++;
-                    
-                    // Update line width tracking
-                    measureSpan.textContent = currentWord.substring(0, currentCharIndex);
-                    if (currentCharIndex === currentWord.length) {
-                        currentLineWidth += measureSpan.offsetWidth;
-                    }
                     
                     let delay = charDelay;
                     const lastChar = currentWord[currentCharIndex - 1];
@@ -1032,6 +1228,7 @@
                     
                     currentTypingTimeout = setTimeout(typeChar, delay);
                 } else {
+                    // Move to next word
                     currentWordIndex++;
                     currentCharIndex = 0;
                     currentTypingTimeout = setTimeout(typeChar, charDelay);
@@ -1119,7 +1316,7 @@
         }
 
         welcomeTimeout = setTimeout(() => {
-            if (!hasStarted && document.getElementById('audioPrompt').style.display !== 'none') {
+            if (!hasStarted && allAssetsLoaded && document.getElementById('audioPrompt').style.display !== 'none') {
                 audioEnabled = false;
                 startPresentation();
             }
@@ -1130,6 +1327,10 @@
                 e.preventDefault();
                 
                 if (!hasStarted && document.getElementById('audioPrompt').style.display === 'none') {
+                    if (!allAssetsLoaded) {
+                        alert('Please wait for all assets to finish loading...');
+                        return;
+                    }
                     startPresentation();
                 } else if (hasStarted && !isTransitioning) {
                     showNextSlide();
