@@ -166,48 +166,6 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        .loading-container {
-            margin-top: 25px;
-            width: 100%;
-            max-width: 500px;
-            display: none;
-        }
-
-        .loading-container.active {
-            display: block;
-        }
-
-        .loading-text {
-            color: white;
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 10px;
-        }
-
-        .loading-stats {
-            margin-top: 10px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9em;
-            text-align: center;
-        }
-
         /* Background image container */
         .background-container {
             position: fixed;
@@ -476,14 +434,6 @@
             </div>
         </div>
         
-        <div class="loading-container" id="loadingContainer">
-            <div class="loading-text">Loading experience...</div>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-            <div class="loading-stats" id="loadingStats">0 / 98 assets loaded</div>
-        </div>
-        
         <div class="welcome-attribution">
             Images from <a href="https://unsplash.com" target="_blank">Unsplash</a> & <a href="https://pexels.com" target="_blank">Pexels</a> · Audio from <a href="https://freesound.org" target="_blank">Freesound</a>
         </div>
@@ -728,46 +678,47 @@
         let assetsLoaded = 0;
         let totalAssets = images.length + ambientTracks.length; // 94 images + 4 audio files = 98
         let allAssetsLoaded = false;
+        let preloadedImages = new Set(); // Track which images are loaded
 
-        // Start preloading immediately
+        // Shuffle images array to load in random order (order they'll be displayed)
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        const shuffledImages = shuffleArray(images);
+
+        // Start preloading immediately (non-blocking, in background)
         preloadAssets();
 
-        // Preload all assets
+        // Preload all assets (non-blocking, continues in background)
         function preloadAssets() {
-            const loadingContainer = document.getElementById('loadingContainer');
-            const progressBar = document.getElementById('progressBar');
-            const loadingStats = document.getElementById('loadingStats');
-            
-            // Show loading UI
-            loadingContainer.classList.add('active');
+            console.log('🚀 Starting background preload of', totalAssets, 'assets...');
+            console.log('📦 Images to load:', images.length, '(in random order)');
+            console.log('🎵 Audio files to load:', ambientTracks.length);
             
             let loadedCount = 0;
-            
-            console.log('🚀 Starting preload of', totalAssets, 'assets...');
-            console.log('📦 Images to load:', images.length);
-            console.log('🎵 Audio files to load:', ambientTracks.length);
             
             function updateProgress() {
                 loadedCount++;
                 assetsLoaded = loadedCount;
-                const percentage = (loadedCount / totalAssets) * 100;
-                progressBar.style.width = percentage + '%';
-                loadingStats.textContent = `${loadedCount} / ${totalAssets} assets loaded`;
                 
                 if (loadedCount === totalAssets) {
                     allAssetsLoaded = true;
                     console.log('✅ All assets loaded successfully!');
-                    setTimeout(() => {
-                        loadingContainer.classList.remove('active');
-                    }, 500);
                 }
             }
             
-            // Preload images
-            images.forEach((imageSrc, index) => {
+            // Preload images in shuffled order
+            shuffledImages.forEach((imageSrc, index) => {
                 const img = new Image();
                 img.onload = () => {
                     console.log(`🖼️  Loaded image ${index + 1}/${images.length}:`, imageSrc);
+                    preloadedImages.add(imageSrc);
                     updateProgress();
                 };
                 img.onerror = () => {
@@ -797,20 +748,12 @@
 
         // Audio button handlers
         document.getElementById('audioYes').addEventListener('click', () => {
-            if (!allAssetsLoaded) {
-                alert('Please wait for all assets to finish loading...');
-                return;
-            }
             audioEnabled = true;
             initializeAudio();
             startPresentation();
         });
 
         document.getElementById('audioNo').addEventListener('click', () => {
-            if (!allAssetsLoaded) {
-                alert('Please wait for all assets to finish loading...');
-                return;
-            }
             audioEnabled = false;
             startPresentation();
         });
@@ -1316,7 +1259,7 @@
         }
 
         welcomeTimeout = setTimeout(() => {
-            if (!hasStarted && allAssetsLoaded && document.getElementById('audioPrompt').style.display !== 'none') {
+            if (!hasStarted && document.getElementById('audioPrompt').style.display !== 'none') {
                 audioEnabled = false;
                 startPresentation();
             }
@@ -1327,10 +1270,6 @@
                 e.preventDefault();
                 
                 if (!hasStarted && document.getElementById('audioPrompt').style.display === 'none') {
-                    if (!allAssetsLoaded) {
-                        alert('Please wait for all assets to finish loading...');
-                        return;
-                    }
                     startPresentation();
                 } else if (hasStarted && !isTransitioning) {
                     showNextSlide();
