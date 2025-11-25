@@ -423,9 +423,8 @@
         </div>
         <div class="tagline">Strategic Vision Generator</div>
         <div class="welcome-text">
-            Welcome to <strong>SynergyMax™</strong>, your AI-powered strategic consultant delivering enterprise-grade vision statements optimized for maximum stakeholder engagement and minimum accountability.
+            Welcome to <strong>SynergyMax™</strong>, your personal corporate gibberish generator.<br>We deliver flawless, enterprise-grade word salad that lets leadership sound visionary and middle managers sound busy—keeping the stock price up and the difficult questions down.
         </div>
-        
         <div class="audio-prompt" id="audioPrompt">
             <div class="audio-question">Enable ambient sound?</div>
             <div class="audio-buttons">
@@ -478,6 +477,14 @@
 
         // SHORT: Ultra-short clichés (5-8 words)
         const shortCliches = [
+            "We're building trust at scale, one mandatory meeting at a time.",
+            "If everything’s a priority, nothing is, so yes—everything is.",
+            "Our culture is our greatest asset; that’s why it’s updated quarterly.",
+            "Let’s leverage this as a learning moment for your future self.",
+            "We’re not out of the woods, but we’ve definitely purchased maps.",
+            "We're not here to boil the ocean, but let’s heat it aggressively.",
+            "Success is a journey, so buckle up and stop asking where we're going.",
+            "Let’s align on alignment.",
             "There's no me in team.",
             "It is what it is.",
             "I know I have a cubicle, but my door is always open.",
@@ -506,7 +513,6 @@
             "Let's enhance cross-functional velocity through thought leadership.",
             "We need to operationalize that.",
             "Let's close the loop and pivot to a scalable solution.",
-            "We're not here to boil the ocean.",
             "That's on my radar but far above my pay grade.",
             "We need to manage expectations, so lower the bar so far we can trip over it.",
             "Can you action that?",
@@ -524,6 +530,13 @@
 
         // MEDIUM: Corporate run-ons with 2-3 buzzwords
         const mediumPhrases = [
+            "I’m ramping up for a pre-brief on tomorrow’s post-mortem.",
+            "My calendar’s a war zone but I’ll find five minutes to miscommunicate live.",
+            "Let’s schedule a stand-up pre-meeting to ensure the meeting meets expectations.",
+            "I’m triple-booked, but only emotionally.",
+            "Let’s align asynchronously until we can misalign synchronously.",
+            "I’m waiting on an update from someone who’s waiting on me.",
+            "Let’s establish a task force to define what the task force should do.",
             "At the end of the day, we need to think outside the box to achieve a win-win scenario.",
             "Moving forward, we should leverage synergies to optimize our core competencies.",
             "Net-net, we have to break down silos and grab the low-hanging fruit.",
@@ -547,12 +560,11 @@
             "We should evangelize our core values to maximize team engagement.",
             "We need to right-size our operational framework for sustainable growth.",
             "Let's socialize this initiative across all business units.",
-            "We must upskill our workforce to remain competitive.",
+            "We must upskill our workforce while reducing headcount to remain on the cutting edge.",
             "Time to operationalize our strategic vision into executable deliverables.",
             "Let's ideate innovative solutions that drive measurable outcomes.",
             "We need to de-layer our organizational structure for greater agility.",
             "We should focus on enablement strategies that empower our teams.",
-            // NEW ADDITIONS
             "We must synchronize our core competencies and leverage an end-to-end framework.",
             "To ensure success, we should deploy a center of excellence that harmonizes key touchpoints.",
             "Net-net, let's unpack the data and evangelize our value proposition to key stakeholders.",
@@ -571,7 +583,12 @@
             "We need to be more proactive about our reactivity.",
             "Let's drill down and double-click on the why behind the what.",
             "We have to stop admiring the problem and start solutioning the solution.",
-            "Our goal is to move the goalposts in a customer-centric way."
+            "Our goal is to move the goalposts in a customer-centric way.",
+"We need to operationalize our operational framework to ensure operational excellence.",
+"Let’s synergize across our verticals until the synergies become horizontal.",
+"We should leverage our holistic ecosystem to maximize frictionless stakeholder visibility.",
+"At scale, our value proposition must be value-propositioned more robustly.",
+"We need to architect a future-forward model that future-proofs yesterday’s roadmap.",
         ];
 
         // LONG: Absurdly long run-on sentences
@@ -593,7 +610,6 @@
             "We need to orchestrate a comprehensive digital transformation initiative that will harmonize our legacy systems with next-generation cloud infrastructure, amplify our competitive advantages, and productize our intellectual property into scalable revenue streams.",
             "Let's ideate a revolutionary approach that will disambiguate our value proposition, evangelize our brand story across all channels, and operationalize our customer success framework to drive exponential growth and market dominance.",
             "We must upskill our entire organization to enable cross-functional collaboration, de-layer bureaucratic bottlenecks, right-size our resource allocation, and socialize best practices that amplify our collective impact across global markets.",
-            // NEW ADDITIONS
             "In order to maximize our innovation bandwidth, we must create a frictionless user journey that capitalizes on disruptive synergy and unlocks hyper-optimized value streams.",
             "We need to strategically sunset our legacy platforms by de-layering our architecture and orchestrating a transformational shift to agile, cloud-native thought leadership.",
             "By strategically leveraging our ecosystem of synergistic, cross-functional, and digital assets, we can fundamentally pivot our entire value proposition to capture bleeding-edge market share while maintaining a laser focus on the optimal customer journey.",
@@ -601,7 +617,12 @@
             "The mandate is to drive continuous improvement by de-layering our organizational structure, right-sizing our resource bandwidth, and evangelizing a culture of accountability that empowers every stakeholder to optimize for quantifiable outcomes.",
             "As we lean into the new year, we need to double down on our core pillars, rightsizing our headcount-to-ambition ratio while maintaining psychological safety in a hybrid-first, mobile-first, cloud-first, AI-first world so that we can continue to deliver best-in-class shareholder value in an increasingly volatile macroeconomic environment.",
             "Net-net-net, when all is said and done, at this moment in time we need to take a step back, zoom out, re-baseline our goals, re-visit our North Star, re-evaluate our swim lanes, and ultimately re-commit to over-delivering on a go-forward basis.",
-            "We're not just transforming, we're digitally transforming our transformation journey in a way that's agile, resilient, and human-centered while still being laser-focused on ROI."
+            "We're not just transforming, we're digitally transforming our transformation journey in a way that's agile, resilient, and human-centered while still being laser-focused on ROI.",
+            "As we pivot toward the next milestone, it’s essential that we integrate cross-functional modalities, recontextualize our north-star deliverables, re-baseline our aspirational KPIs, and architect a fully future-harmonized stakeholder ecosystem that brings thought leadership to each value node in a post-agile paradigm.",
+            "Given the volatility of our macro-environmental landscape, we should future-proof our transformational agility by realigning our core competencies, enhancing cross-organizational throughput, operationalizing our paradigm-shift architectures, and iterating a scalable, frictionless value engine that harmonizes with consumer expectations in real time.",
+            "We must adopt a holistic, next-gen mindset that allows us to revitalize our enterprise-wide narrative, democratize our knowledge silos, uplift our stakeholders, and accelerate our digital-first synergy pipelines, all while maintaining a customer-centric approach to our iterative innovation cycles.",
+            "We must aggressively compress our learning velocity by aligning organizational incentives, re-envisioning our north-star frameworks, de-layering our cross-functional bandwidth ecosystem, and productizing every emergent insight into a frictionless omni-channel deliverable.",
+            "To ensure dynamic resilience in a disruptive global marketplace, we need to re-architect our operational pillars, cultivate cross-functional empowerment, harmonize our internal value matrices, and deliver hyper-optimized stakeholder outcomes that reflect a continuous pursuit of excellence throughout our end-to-end innovation lifecycle."
         ];
 
         // Self-important "busy/plate-full" declarations
@@ -616,7 +637,6 @@
             "Let's put a pin in putting pins in things until we can unpin all the pins we've pinned.",
             "I'm triple-booked but let's find time to unpack that.",
             "I'm waiting for clarity from leadership who are waiting for clarity from us.",
-            "We need to establish a cadence for establishing cadence.",
             "I'll be heads-down circling back today.",
             "Our timeline is aggressive, but not impossible if we believe.",
             "I'm waiting for someone to green-light the green-lighting process.",
